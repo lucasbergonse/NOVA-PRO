@@ -1,0 +1,10 @@
+{
+  "name": "Copy of Nova Pro - Neural OS",
+  "description": "Um sistema operacional assistente com capacidades avançadas de Autopilot e visão neural.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera",
+    "display-capture",
+    "geolocation"
+  ]
+}
