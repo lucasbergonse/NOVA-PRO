@@ -28,6 +28,25 @@ const CodeBlock: React.FC<{ code: string; language: string }> = ({ code, languag
   );
 };
 
+const FileCard: React.FC<{ file: { name: string; url?: string; type: string }; isAssistant: boolean }> = ({ file, isAssistant }) => {
+    return (
+        <div className={`mt-2 p-3 rounded-xl border flex items-center gap-3 ${isAssistant ? 'bg-cyan-900/20 border-cyan-500/30' : 'bg-slate-800/50 border-white/10'}`}>
+            <div className={`p-2 rounded-lg ${isAssistant ? 'bg-cyan-500/20 text-cyan-400' : 'bg-slate-700 text-slate-300'}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            </div>
+            <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-white truncate">{file.name}</p>
+                <p className="text-[10px] text-slate-400 uppercase tracking-wider">{file.type}</p>
+            </div>
+            {file.url && (
+                <a href={file.url} download={file.name} className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-[10px] font-bold uppercase rounded-lg transition-colors">
+                    Baixar
+                </a>
+            )}
+        </div>
+    )
+}
+
 const FormattedText: React.FC<{ text: string; isAssistant: boolean }> = ({ text, isAssistant }) => {
   const parts = text.split(/(```[\s\S]*?```)/g);
   return (
@@ -71,6 +90,7 @@ const TranscriptionList: React.FC<TranscriptionListProps> = ({ messages }) => {
           </span>
           <div className={`max-w-[90%] px-5 py-4 rounded-2xl shadow-lg ${msg.role === 'user' ? 'bg-cyan-500/10 border border-cyan-500/10 rounded-tr-none' : 'bg-slate-900/80 border border-white/5 rounded-tl-none'}`}>
             <FormattedText text={msg.text} isAssistant={msg.role === 'assistant'} />
+            {msg.fileAttachment && <FileCard file={msg.fileAttachment} isAssistant={msg.role === 'assistant'} />}
           </div>
         </div>
       ))}

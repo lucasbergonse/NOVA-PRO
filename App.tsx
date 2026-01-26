@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useGemini } from './hooks/useGemini';
 import { ConnectionStatus } from './types';
 import { Header } from './components/Header';
@@ -24,10 +24,12 @@ const App: React.FC = () => {
     stopScreenSharing,
     videoRef,
     canvasRef,
-    sendText
+    sendText,
+    sendFile 
   } = useGemini();
 
   const [textCommand, setTextCommand] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleToggleConnection = () => {
       if (status === ConnectionStatus.CONNECTED || status === ConnectionStatus.CONNECTING) {
@@ -44,9 +46,16 @@ const App: React.FC = () => {
       }
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+          sendFile(e.target.files[0]);
+      }
+      // Reset input
+      if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const clearChat = () => {
       setMessages([]);
-      localStorage.removeItem('nova_chat_history');
   };
 
   return (
@@ -74,11 +83,25 @@ const App: React.FC = () => {
           <div className="p-4 bg-slate-900/50 border-t border-white/10">
             <div className="flex items-center gap-2">
               <input 
+                 type="file" 
+                 ref={fileInputRef} 
+                 onChange={handleFileSelect} 
+                 className="hidden" 
+              />
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="p-3 rounded-xl bg-slate-800 text-slate-400 hover:text-cyan-400 hover:bg-slate-700 transition-all border border-white/5"
+                title="Anexar Arquivo"
+              >
+                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+              </button>
+
+              <input 
                 type="text" 
                 value={textCommand} 
                 onChange={(e) => setTextCommand(e.target.value)} 
                 onKeyDown={(e) => e.key === 'Enter' && handleSendText()} 
-                placeholder="Enviar comando de texto..." 
+                placeholder="Enviar comando ou pergunta..." 
                 className="flex-1 bg-slate-950 border border-white/10 rounded-xl py-3 px-4 text-xs outline-none focus:border-cyan-500/50 transition-all text-white placeholder-slate-600"
               />
               <button onClick={handleSendText} className="p-3 rounded-xl bg-cyan-600 text-white hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-900/20">

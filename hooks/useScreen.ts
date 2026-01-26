@@ -28,8 +28,9 @@ export const useScreen = (sendInput: (data: any) => void) => {
             video: { 
                 cursor: "always", 
                 displaySurface: "monitor",
-                width: { ideal: 1920, max: 3840 }, // Solicita Full HD ou superior
-                height: { ideal: 1080, max: 2160 }
+                width: { ideal: 1920, max: 3840 }, 
+                height: { ideal: 1080, max: 2160 },
+                frameRate: { ideal: CONFIG.FRAME_RATE }
             } as any, 
             audio: {
                 echoCancellation: false,
@@ -38,7 +39,7 @@ export const useScreen = (sendInput: (data: any) => void) => {
             } 
         });
         screenStreamRef.current = stream;
-        setScreenStream(stream); // Expose to parent
+        setScreenStream(stream); 
         
         if (videoRef.current) {
             videoRef.current.srcObject = stream;
@@ -56,6 +57,10 @@ export const useScreen = (sendInput: (data: any) => void) => {
   useEffect(() => {
     let intervalId: any;
     if (isScreenSharing) {
+        // Reduzido para 30fps no processamento para economizar CPU enquanto captura a 60
+        // O envio real só ocorre se houver mudanças.
+        const PROCESSING_FPS = 10; 
+        
         intervalId = setInterval(() => {
             const video = videoRef.current;
             const canvas = canvasRef.current;
@@ -64,9 +69,10 @@ export const useScreen = (sendInput: (data: any) => void) => {
                 const vw = video.videoWidth;
                 const vh = video.videoHeight;
                 
-                // Redimensionamento inteligente mantendo Aspect Ratio
                 let targetW = vw;
                 let targetH = vh;
+                
+                // Redimensionamento Inteligente
                 if (vw > CONFIG.VISUAL_MAX_DIMENSION || vh > CONFIG.VISUAL_MAX_DIMENSION) {
                      const ratio = vw / vh;
                      if (ratio > 1) {
@@ -91,29 +97,31 @@ export const useScreen = (sendInput: (data: any) => void) => {
                     const currentData = imageData.data;
                     const now = Date.now();
 
-                    // Algoritmo de Diferença de Pixels (Pixel Diffing)
-                    // Só envia se houver mudança significativa ou heartbeat a cada 3s
                     let hasChange = false;
                     
                     if (!previousFrameDataRef.current) {
                         hasChange = true;
                     } else if (now - lastFrameTimeRef.current > 3000) {
-                        hasChange = true;
+                        hasChange = true; // Heartbeat a cada 3s
                     } else {
-                        // Amostragem de pixels para performance (checa 1 a cada 64 pixels)
+                        // OTIMIZAÇÃO PARA CÓDIGO:
+                        // Aumentamos a precisão (sampleStep menor) e diminuímos o threshold
+                        // para detectar pequenas mudanças de texto ou cursor.
                         let diffCount = 0;
-                        const threshold = 35; // Sensibilidade de cor
+                        const threshold = 15; // Mais sensível (era 35)
                         const totalPixels = currentData.length;
-                        const sampleStep = 64; 
+                        const sampleStep = 32; // Checa 1 a cada 32 pixels (era 64)
                         
                         for (let i = 0; i < totalPixels; i += sampleStep) {
+                            // Compara apenas Canal Verde (G) para velocidade (o olho humano e código costumam ter bom contraste no verde)
+                            // ou compare a soma média se preferir, mas absoluto no array direto é mais rápido.
                             if (Math.abs(currentData[i] - previousFrameDataRef.current[i]) > threshold) {
                                 diffCount++;
                             }
                         }
                         
-                        // Se 5% dos pixels amostrados mudaram
-                        if (diffCount > (totalPixels / sampleStep) * 0.05) {
+                        // Se 1% dos pixels mudaram (mais sensível)
+                        if (diffCount > (totalPixels / sampleStep) * 0.01) {
                             hasChange = true;
                         }
                     }
@@ -126,7 +134,7 @@ export const useScreen = (sendInput: (data: any) => void) => {
                     }
                 }
             }
-        }, 1000 / CONFIG.FRAME_RATE);
+        }, 1000 / PROCESSING_FPS);
     }
     return () => clearInterval(intervalId);
   }, [isScreenSharing, sendInput]);

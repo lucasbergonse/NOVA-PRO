@@ -35,11 +35,18 @@ export const useAudio = (
     if (audioContextOutRef.current.state === 'suspended') await audioContextOutRef.current.resume();
 
     try {
-        const blob = new Blob([WORKLET_CODE], { type: 'application/javascript' });
-        const workletUrl = URL.createObjectURL(blob);
-        await audioContextInRef.current.audioWorklet.addModule(workletUrl);
+        // Prevent adding module multiple times
+        try {
+           // We use a blob URL, but audioWorklet.addModule doesn't throw if added twice with same URL usually,
+           // but to be safe we can wrap. However, simple error suppression is enough here.
+           const blob = new Blob([WORKLET_CODE], { type: 'application/javascript' });
+           const workletUrl = URL.createObjectURL(blob);
+           await audioContextInRef.current.audioWorklet.addModule(workletUrl);
+        } catch (e) {
+             // Ignore if module already exists or other non-critical loading errors
+        }
     } catch (e) {
-         console.warn("Worklet module load warning:", e);
+         console.warn("Worklet setup warning:", e);
     }
   }, []);
 
@@ -79,9 +86,10 @@ export const useAudio = (
             });
         }
 
+        // Clean up existing worklet if present
         if (workletNodeRef.current) {
-            workletNodeRef.current.disconnect();
             workletNodeRef.current.port.onmessage = null;
+            workletNodeRef.current.disconnect();
         }
 
         const source = audioContextInRef.current.createMediaStreamSource(micStreamRef.current);
@@ -91,6 +99,7 @@ export const useAudio = (
             const inputData = event.data;
             
             let sum = 0;
+            // Simple RMS calculation
             for (let i = 0; i < inputData.length; i += 4) sum += inputData[i] * inputData[i];
             const rms = Math.sqrt(sum / (inputData.length / 4));
             onInputVolume(rms);
@@ -106,6 +115,7 @@ export const useAudio = (
 
             if (!isMuted) {
                 const pcmBlob = createPcmBlob(inputData);
+                // Send data
                 sendCallback({ media: { data: pcmBlob, mimeType: 'audio/pcm;rate=16000' } });
             }
         };
@@ -156,19 +166,23 @@ export const useAudio = (
     nextStartTimeRef.current = 0;
     
     if (workletNodeRef.current) {
-        workletNodeRef.current.disconnect();
+        workletNodeRef.current.port.onmessage = null; // Important: Stop receiving data immediately
+        try { workletNodeRef.current.disconnect(); } catch(e) {}
         workletNodeRef.current = null;
     }
     
     if (externalSourceRef.current) {
-        externalSourceRef.current.disconnect();
+        try { externalSourceRef.current.disconnect(); } catch(e) {}
         externalSourceRef.current = null;
     }
+    
+    // We do NOT stop micStreamRef here to keep permissions alive, but we could if we wanted full shutdown.
+    // keeping it allows fast restart.
   }, []);
 
   const unlockContexts = useCallback(() => {
-    if (audioContextInRef.current?.state === 'suspended') audioContextInRef.current.resume();
-    if (audioContextOutRef.current?.state === 'suspended') audioContextOutRef.current.resume();
+    if (audioContextInRef.current?.state === 'suspended') audioContextInRef.current.resume().catch(() => {});
+    if (audioContextOutRef.current?.state === 'suspended') audioContextOutRef.current.resume().catch(() => {});
   }, []);
 
   useEffect(() => {

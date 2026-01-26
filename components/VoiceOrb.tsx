@@ -43,7 +43,10 @@ const VoiceOrb: React.FC<VoiceOrbProps> = ({ isSpeaking, isUserSpeaking, isThink
     red: 'shadow-none',
   };
 
-  const pulseScale = 1 + (isUserSpeaking && !isMuted ? inputLevel * 1.5 : isSpeaking ? 0.15 : isThinking ? 0.05 : 0);
+  // Safety checks for NaN or Infinity
+  const safeInputLevel = isNaN(inputLevel) || !isFinite(inputLevel) ? 0 : inputLevel;
+  
+  const pulseScale = 1 + (isUserSpeaking && !isMuted ? safeInputLevel * 1.5 : isSpeaking ? 0.15 : isThinking ? 0.05 : 0);
   const opacity = isUserSpeaking ? 0.8 : isSpeaking ? 0.9 : 0.4;
 
   return (
@@ -54,7 +57,7 @@ const VoiceOrb: React.FC<VoiceOrbProps> = ({ isSpeaking, isUserSpeaking, isThink
       `}></div>
 
       <div className="relative w-96 h-96 flex items-center justify-center">
-        <svg viewBox="0 0 200 200" className="absolute w-full h-full transform transition-transform duration-100" style={{ transform: `scale(${pulseScale})` }}>
+        <svg viewBox="0 0 200 200" className="absolute w-full h-full transform transition-transform duration-100" style={{ transform: `scale(${Math.min(pulseScale, 3)})` }}>
           <defs>
             <linearGradient id="orbGradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" className={`${theme.color === 'emerald' ? 'text-emerald-400' : theme.color === 'rose' ? 'text-rose-500' : 'text-cyan-400'}`} style={{ stopColor: 'currentColor' }} />
@@ -76,13 +79,13 @@ const VoiceOrb: React.FC<VoiceOrbProps> = ({ isSpeaking, isUserSpeaking, isThink
                 className={`transition-all duration-300 transform-gpu ${isThinking ? 'animate-[pulse_1s_ease-in-out_infinite]' : 'animate-[pulse_4s_ease-in-out_infinite]'}`}
                 style={{ 
                 opacity: opacity * 0.30,
-                transform: `rotate(${isThinking ? Date.now()/10 : 0}deg) scale(${1 + inputLevel})`
+                transform: `rotate(${isThinking ? Date.now()/10 : 0}deg) scale(${1 + safeInputLevel})`
                 }}
             />
           )}
 
           <circle 
-            cx="100" cy="100" r={isMuted ? 30 : 40 + (inputLevel * 40)} 
+            cx="100" cy="100" r={isMuted ? 30 : 40 + (safeInputLevel * 40)} 
             fill="url(#orbGradient)" 
             className="transition-all duration-300 transform-gpu"
             style={{ opacity: isMuted ? 0.2 : opacity * 0.4 }}
@@ -97,7 +100,7 @@ const VoiceOrb: React.FC<VoiceOrbProps> = ({ isSpeaking, isUserSpeaking, isThink
           transition-all duration-500 ease-out transform-gpu
           flex items-center justify-center
         `}
-        style={{ transform: `scale(${isUserSpeaking && !isMuted ? 1.1 + inputLevel : isThinking ? 1.05 : 1})` }}>
+        style={{ transform: `scale(${isUserSpeaking && !isMuted ? 1.1 + safeInputLevel : isThinking ? 1.05 : 1})` }}>
           
           <div className="w-[98%] h-[98%] rounded-full bg-[#020617] flex items-center justify-center overflow-hidden relative">
              <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"></div>

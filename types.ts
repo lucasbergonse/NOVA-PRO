@@ -1,10 +1,15 @@
 
 export interface Transcription {
   id: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   text: string;
   timestamp: Date;
-  imageUrl?: string;
+  fileAttachment?: {
+    name: string;
+    type: string;
+    url?: string; // Para downloads gerados
+    content?: string; // Para preview
+  };
 }
 
 export enum ConnectionStatus {
