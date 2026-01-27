@@ -30,15 +30,15 @@ export const Header: React.FC<HeaderProps> = ({ status, isMuted, onToggleMute, o
                       <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                   </button>
                   
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-[#0B1221] border border-white/10 rounded-xl shadow-2xl overflow-hidden hidden group-hover:block z-50">
+                  <div className="absolute top-full left-0 mt-2 w-56 bg-[#0B1221] border border-white/10 rounded-xl shadow-2xl overflow-hidden hidden group-hover:block z-[100]">
                       {Object.values(PERSONAS).map((p) => (
                           <button 
                             key={p.id}
                             onClick={() => onPersonaChange(p.id)}
-                            className={`w-full text-left px-4 py-3 text-xs font-bold flex flex-col gap-1 hover:bg-white/5 transition-colors ${currentPersona.id === p.id ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400'}`}
+                            className={`w-full text-left px-4 py-3 text-xs font-bold flex flex-col gap-1 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 ${currentPersona.id === p.id ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-400'}`}
                           >
                               <span className="uppercase tracking-wider">{p.name}</span>
-                              <span className="text-[10px] font-normal opacity-70 normal-case">{p.role}</span>
+                              <span className="text-[10px] font-normal opacity-70 normal-case text-slate-500">{p.role}</span>
                           </button>
                       ))}
                   </div>

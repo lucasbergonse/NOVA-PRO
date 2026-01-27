@@ -183,7 +183,7 @@ export const useAudio = (
     if (!base64Audio || !audioContextOutRef.current) return;
 
     audioProcessingChain.current = audioProcessingChain.current.then(async () => {
-        if (!audioContextOutRef.current || audioContextOutRef.current.state === 'closed') return;
+        if (!audioContextOutRef.current || (audioContextOutRef.current.state as string) === 'closed') return;
         
         await ensureContexts();
 
@@ -191,7 +191,7 @@ export const useAudio = (
             const buffer = await decodeAudioData(decode(base64Audio), audioContextOutRef.current, CONFIG.SAMPLE_RATE_OUT, 1);
             
             // Check context again after async decode
-            if (!audioContextOutRef.current || audioContextOutRef.current.state === 'closed') return;
+            if (!audioContextOutRef.current || (audioContextOutRef.current.state as string) === 'closed') return;
 
             const ctx = audioContextOutRef.current;
             const source = ctx.createBufferSource();

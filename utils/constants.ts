@@ -56,7 +56,7 @@ export const PERSONAS: Record<string, Persona> = {
   GENERAL: {
     id: 'general',
     name: 'Assistente Pessoal',
-    role: 'Pessoal & Geral',
+    role: 'Organização & Agenda',
     description: 'Seu braço direito para organização, agenda e tarefas do dia a dia.',
     systemInstruction: `${BASE_INSTRUCTION}
     ROLE: Executive Personal Assistant.
@@ -65,8 +65,8 @@ export const PERSONAS: Record<string, Persona> = {
   },
   DEVELOPER: {
     id: 'developer',
-    name: 'Tech Lead',
-    role: 'Técnico / Dev',
+    name: 'Assistente Técnico',
+    role: 'Dev & Arquitetura',
     description: 'Especialista em código, arquitetura, debugging e DevOps.',
     systemInstruction: `${BASE_INSTRUCTION}
     ROLE: Senior Software Architect & Tech Lead.
@@ -80,8 +80,8 @@ export const PERSONAS: Record<string, Persona> = {
   },
   FINANCE: {
     id: 'finance',
-    name: 'CFO Advisor',
-    role: 'Financeiro',
+    name: 'Assistente Financeiro',
+    role: 'Mercado & Finanças',
     description: 'Análise de mercado, planilhas, ROI e gestão de riscos.',
     systemInstruction: `${BASE_INSTRUCTION}
     ROLE: Senior Financial Analyst & CFO Advisor.
@@ -94,8 +94,8 @@ export const PERSONAS: Record<string, Persona> = {
   },
   LEGAL: {
     id: 'legal',
-    name: 'Counsel',
-    role: 'Jurídico',
+    name: 'Assistente Jurídico',
+    role: 'Leis & Contratos',
     description: 'Análise de contratos, riscos legais e conformidade.',
     systemInstruction: `${BASE_INSTRUCTION}
     ROLE: Corporate Legal Counsel (AI Assistant).
@@ -108,8 +108,8 @@ export const PERSONAS: Record<string, Persona> = {
   },
   SALES: {
     id: 'sales',
-    name: 'Closer',
-    role: 'Vendedor',
+    name: 'Assistente Vendedor',
+    role: 'Vendas & Negociação',
     description: 'Estratégias de negociação, copy de vendas e persuasão.',
     systemInstruction: `${BASE_INSTRUCTION}
     ROLE: Top-Tier Sales Executive & Copywriter.
@@ -122,8 +122,8 @@ export const PERSONAS: Record<string, Persona> = {
   },
   CREATIVE: {
     id: 'creative',
-    name: 'Creative Director',
-    role: 'Criativo / Mkt',
+    name: 'Assistente Criativo',
+    role: 'Design & Marketing',
     description: 'Brainstorming, design, branding e criação de conteúdo.',
     systemInstruction: `${BASE_INSTRUCTION}
     ROLE: Creative Director & Brand Strategist.

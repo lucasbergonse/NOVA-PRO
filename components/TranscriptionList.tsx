@@ -19,7 +19,7 @@ const CodeBlock: React.FC<{ code: string; language: string }> = ({ code, languag
 
   return (
     <div className="my-3 rounded-xl overflow-hidden border border-cyan-500/20 bg-[#0B1221] shadow-2xl group/code relative">
-      <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5 backdrop-blur-sm">
+      <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5 backdrop-blur-sm select-none">
         <div className="flex items-center gap-2">
            <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
            <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50"></div>
@@ -32,7 +32,7 @@ const CodeBlock: React.FC<{ code: string; language: string }> = ({ code, languag
       </div>
       <div className="relative">
         <pre className="p-4 overflow-x-auto custom-scrollbar">
-          <code className="text-[13px] font-mono text-slate-300 leading-relaxed block min-w-full">
+          <code className="text-[13px] font-mono text-slate-300 leading-relaxed block min-w-full select-text cursor-text">
             {code}
           </code>
         </pre>
@@ -113,7 +113,7 @@ const FileCard: React.FC<{ file: NonNullable<Transcription['fileAttachment']>; i
 const FormattedText: React.FC<{ text: string; isAssistant: boolean }> = ({ text, isAssistant }) => {
   const parts = text.split(/(```[\s\S]*?```)/g);
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 select-text cursor-text">
       {parts.map((part, i) => {
         if (part.startsWith('```')) {
           const match = part.match(/```(\w+)?\n([\s\S]*?)```/);
@@ -133,7 +133,7 @@ const FormattedText: React.FC<{ text: string; isAssistant: boolean }> = ({ text,
 };
 
 const Avatar: React.FC<{ role: string }> = ({ role }) => (
-  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border ${
+  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border select-none ${
     role === 'user' 
     ? 'bg-slate-800 border-white/10' 
     : 'bg-gradient-to-tr from-cyan-600 to-blue-600 border-cyan-400/30 shadow-[0_0_15px_rgba(6,182,212,0.3)]'
@@ -183,7 +183,7 @@ const TranscriptionList: React.FC<TranscriptionListProps> = ({ messages, isThink
             <Avatar role={msg.role} />
             
             <div className={`flex flex-col max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                <div className="flex items-center gap-2 mb-1 px-1">
+                <div className="flex items-center gap-2 mb-1 px-1 select-none">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{msg.role === 'user' ? 'Você' : 'Nova Pro'}</span>
                     <span className="text-[9px] text-slate-700">{msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
