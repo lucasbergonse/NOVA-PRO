@@ -7,8 +7,9 @@ export interface Transcription {
   fileAttachment?: {
     name: string;
     type: string;
-    url?: string; // Para downloads gerados
-    content?: string; // Para preview
+    url?: string; // Para downloads gerados ou prévia local
+    content?: string; // Para preview de texto
+    size?: number; // Tamanho em bytes
   };
 }
 
@@ -24,4 +25,23 @@ export interface PendingAction {
   name: string;
   args: any;
   description: string;
+}
+
+export type PersonaKey = 'general' | 'developer' | 'finance' | 'legal' | 'sales' | 'creative';
+
+export interface Persona {
+  id: PersonaKey;
+  name: string;
+  role: string;
+  description: string;
+  systemInstruction: string;
+}
+
+export interface ChatContext {
+  id: string;
+  title: string;
+  lastModified: number;
+  personaId: PersonaKey;
+  summary?: string;
+  preview?: string;
 }

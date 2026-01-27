@@ -31,9 +31,20 @@ export async function processFileForAI(file: File): Promise<{ mimeType: string; 
 
 /**
  * Gera uma Blob URL para o conteúdo do arquivo, permitindo o download via botão no chat.
- * Não força o download automático para evitar duplicação quando o usuário clica no botão.
  */
 export function generateFileUrl(content: string): string {
   const blob = new Blob([content], { type: 'text/plain' });
   return URL.createObjectURL(blob);
+}
+
+/**
+ * Formata bytes em tamanho legível (KB, MB)
+ */
+export function formatFileSize(bytes?: number): string {
+  if (bytes === undefined || bytes === null) return '';
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
